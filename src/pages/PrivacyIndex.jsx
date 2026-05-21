@@ -36,6 +36,10 @@ export default function PrivacyIndex() {
           description="Restaurant memory and food logging app"
           link="/privacy/what-i-liked"
         />
+        <AppLink name="KidneyOS"
+          description="Kidney-focused nutrition and wellness support app"
+          link="/privacy/kidneyos"
+        />
       </div>
 
       <hr style={styles.hr} />
