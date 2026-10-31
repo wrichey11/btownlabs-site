@@ -5,6 +5,7 @@ import PrivacyFoodLedgerKidney from "./pages/PrivacyFoodLedgerKidney";
 import PrivacyMyGrocery from "./pages/PrivacyMyGrocery";
 import PrivacyWhatILiked from "./pages/PrivacyWhatILiked";
 import PrivacyKidneyOS from "./pages/PrivacyKidneyOS";
+import PrivacyBendword from "./pages/PrivacyBendword";
 
 function BtownLabsLandingPage() {
   const services = [
@@ -292,6 +293,7 @@ export default function App() {
       <Route path="/privacy/mygrocery-ezscan" element={<PrivacyMyGrocery />} />
       <Route path="/privacy/what-i-liked" element={<PrivacyWhatILiked />} />
       <Route path="/privacy/kidneyos" element={<PrivacyKidneyOS />} />
+      <Route path="/privacy/bendword" element={<PrivacyBendword />} />
     </Routes>
   );
 }
