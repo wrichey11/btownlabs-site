@@ -293,6 +293,7 @@ export default function App() {
       <Route path="/privacy/mygrocery-ezscan" element={<PrivacyMyGrocery />} />
       <Route path="/privacy/what-i-liked" element={<PrivacyWhatILiked />} />
       <Route path="/privacy/kidneyos" element={<PrivacyKidneyOS />} />
+      <Route path="/privacy/bendword" element={<PrivacyBendword />} />
     </Routes>
   );
 }
