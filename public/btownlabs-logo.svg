@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="72" viewBox="0 0 360 72" role="img" aria-labelledby="t">
+<title id="t">Btown Labs</title>
+<rect x="0" y="1" width="70" height="70" rx="16" fill="#092337"/>
+<rect x="12" y="13" width="21" height="21" rx="5" fill="#05C8B5"/>
+<rect x="37" y="13" width="21" height="21" rx="5" fill="#187DDF"/>
+<rect x="12" y="38" width="21" height="21" rx="5" fill="#175BA3"/>
+<rect x="37" y="38" width="21" height="21" rx="5" fill="#037B78"/>
+<text x="84" y="50" font-family="Inter, Arial, Helvetica, sans-serif" font-size="44" font-weight="750" letter-spacing="-2.3" fill="#FFFFFF">Btown</text>
+<text x="221" y="50" font-family="Inter, Arial, Helvetica, sans-serif" font-size="44" font-weight="750" letter-spacing="-2.3" fill="#05D4BB">Labs</text>
+</svg>
