@@ -1,3 +1,4 @@
+
 import React from "react";
 
 export default function PrivacyIndex() {
@@ -5,7 +6,7 @@ export default function PrivacyIndex() {
     <main style={styles.main}>
       <h1 style={styles.h1}>Btown Labs Privacy Policies</h1>
 
-      <p style={styles.updated}>Last updated: May 2026</p>
+      <p style={styles.updated}>Last updated: October 2026</p>
 
       <p style={styles.p}>
         Btown Labs builds simple, privacy-focused apps. Each app has its own
@@ -36,9 +37,17 @@ export default function PrivacyIndex() {
           description="Restaurant memory and food logging app"
           link="/privacy/what-i-liked"
         />
-        <AppLink name="KidneyOS"
+
+        <AppLink
+          name="KidneyOS"
           description="Kidney-focused nutrition and wellness support app"
           link="/privacy/kidneyos"
+        />
+
+        <AppLink
+          name="Bendword"
+          description="Daily word transformation puzzle game"
+          link="/privacy/bendword"
         />
       </div>
 
