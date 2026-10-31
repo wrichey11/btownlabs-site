@@ -49,6 +49,11 @@ export default function PrivacyIndex() {
           description="Daily word transformation puzzle game"
           link="/privacy/bendword"
         />
+          <AppLink
+          name="Tidebreaker"
+          description="Fight the scourge of the sea"
+          link="/privacy/tidebreaker"
+        />
       </div>
 
       <hr style={styles.hr} />
