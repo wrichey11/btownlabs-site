@@ -54,6 +54,13 @@ export default function PrivacyIndex() {
           description="Fight the scourge of the sea"
           link="/privacy/tidebreaker"
         />
+         <AppLink
+          name="BtownSolitaire"
+          description="Classic Card Game Fun"
+          link="/privacy/btownsolitaire"
+        />
+
+        
       </div>
 
       <hr style={styles.hr} />
