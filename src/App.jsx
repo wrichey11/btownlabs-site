@@ -5,7 +5,7 @@ import PrivacyFoodLedgerKidney from "./pages/PrivacyFoodLedgerKidney";
 import PrivacyMyGrocery from "./pages/PrivacyMyGrocery";
 import PrivacyWhatILiked from "./pages/PrivacyWhatILiked";
 import PrivacyKidneyOS from "./pages/PrivacyKidneyOS";
-
+import PrivacyBendword from "./pages/PrivacyBendword";
 function BtownLabsLandingPage() {
   const services = [
     {
