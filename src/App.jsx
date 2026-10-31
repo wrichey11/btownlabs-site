@@ -5,7 +5,6 @@ import PrivacyFoodLedgerKidney from "./pages/PrivacyFoodLedgerKidney";
 import PrivacyMyGrocery from "./pages/PrivacyMyGrocery";
 import PrivacyWhatILiked from "./pages/PrivacyWhatILiked";
 import PrivacyKidneyOS from "./pages/PrivacyKidneyOS";
-import PrivacyBendword from "./pages/PrivacyBendword";
 
 function BtownLabsLandingPage() {
   const services = [
@@ -63,14 +62,15 @@ function BtownLabsLandingPage() {
 
       <header className="sticky top-0 z-30 border-b border-white/10 bg-zinc-950/70 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-          <div>
-            <div className="text-xs uppercase tracking-[0.35em] text-cyan-300">
-              Btown Labs
-            </div>
-            <div className="text-sm text-zinc-400">
-              Software development & technology consulting
-            </div>
-          </div>
+          <a href="/" aria-label="Btown Labs — home" className="flex items-center gap-3 shrink-0">
+            <img
+              src="/btownlabs-logo.svg"
+              alt="Btown Labs"
+              className="h-10 w-auto max-w-[220px] sm:h-12 sm:max-w-none"
+              width="278"
+              height="56"
+            />
+          </a>
           <nav className="hidden gap-8 text-sm text-zinc-300 md:flex">
             <a href="#services" className="transition hover:text-white">
               Services
@@ -293,7 +293,6 @@ export default function App() {
       <Route path="/privacy/mygrocery-ezscan" element={<PrivacyMyGrocery />} />
       <Route path="/privacy/what-i-liked" element={<PrivacyWhatILiked />} />
       <Route path="/privacy/kidneyos" element={<PrivacyKidneyOS />} />
-      <Route path="/privacy/bendword" element={<PrivacyBendword />} />
     </Routes>
   );
 }
