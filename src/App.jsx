@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import KidneyOS from "./kidneyos/KidneyOS";
 import PrivacyIndex from "./pages/PrivacyIndex";
 import PrivacyPillLedger from "./pages/PrivacyPillLedger";
 import PrivacyFoodLedgerKidney from "./pages/PrivacyFoodLedgerKidney";
@@ -75,6 +76,9 @@ function BtownLabsLandingPage() {
             />
           </a>
           <nav className="hidden gap-8 text-sm text-zinc-300 md:flex">
+            <a href="/kidneyos" className="transition hover:text-white">
+              KidneyOS
+            </a>
             <a href="#services" className="transition hover:text-white">
               Services
             </a>
@@ -122,6 +126,10 @@ function BtownLabsLandingPage() {
                 Explore Services
               </a>
             </div>
+            <p className="mt-6 text-sm text-zinc-300">
+              Looking for our kidney-care tracking app?{" "}
+              <a href="/kidneyos" className="font-semibold text-cyan-300 underline underline-offset-4 hover:text-cyan-200">Explore KidneyOS →</a>
+            </p>
             <div className="mt-10 grid gap-3 text-sm text-zinc-400 sm:grid-cols-2">
               {pillars.map((item) => (
                 <div
@@ -286,6 +294,10 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<BtownLabsLandingPage />} />
+      <Route path="/kidneyos" element={<KidneyOS />} />
+      <Route path="/kidneyos/renal-diet-tracker" element={<KidneyOS />} />
+      <Route path="/kidneyos/dialysis-tracker" element={<KidneyOS />} />
+      <Route path="/kidneyos/caregivers" element={<KidneyOS />} />
       <Route path="/privacy" element={<PrivacyIndex />} />
       <Route path="/privacy-policy" element={<PrivacyIndex />} />
       <Route path="/privacy/pillledger" element={<PrivacyPillLedger />} />
