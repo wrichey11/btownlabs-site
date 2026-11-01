@@ -4,3 +4,33 @@
 @media(max-width:960px){.ko-hero__grid{gap:15px}.ko-float--top{right:-5px}.ko-float--bottom{left:-5px}.ko-orbit{width:350px;height:350px}.ko-orbit--two{width:460px;height:460px}.ko-split{gap:35px}.ko-nav{gap:15px}.ko-feature{padding:21px}}
 @media(max-width:720px){.ko-container{width:min(100% - 36px,550px)}.ko-header__content{height:70px}.ko-nav{display:none}.ko-logo{font-size:21px}.ko-header__download{padding:9px 13px;font-size:12px}.ko-hero__grid{grid-template-columns:1fr;min-height:auto;gap:30px;padding:62px 0 65px}.ko-hero h1{font-size:clamp(39px,11vw,56px)}.ko-lead{font-size:16px;margin-top:21px!important}.ko-hero__visual{min-height:440px}.ko-orbit{width:320px;height:320px}.ko-orbit--two{width:420px;height:420px}.ko-hero__visual .ko-shot{width:210px;height:408px}.ko-float--top{top:70px;right:0}.ko-float--bottom{bottom:45px;left:0}.ko-float{padding:9px 10px}.ko-float strong{font-size:10px}.ko-float small{font-size:9px}.ko-trust__inner{gap:12px}.ko-trust__inner>span:first-child{width:100%;text-align:center}.ko-section{padding:65px 0}.ko-feature-grid,.ko-audience-grid,.ko-split,.ko-detail-grid{grid-template-columns:1fr}.ko-feature{min-height:unset}.ko-split{gap:45px}.ko-cta__inner,.ko-footer__top{flex-direction:column;align-items:flex-start}.ko-footer__links{gap:12px 22px}.ko-detail-grid{gap:50px}.ko-detail-grid>.ko-shot{width:210px;height:410px}.ko-cta{padding:55px 0}.ko-section__header h2,.ko-split h2,.ko-cta h2{font-size:34px}.ko-audience-grid p{min-height:unset}}
 @media(prefers-reduced-motion:reduce){.kidneyos-site *, .kidneyos-site *::before,.kidneyos-site *::after{scroll-behavior:auto!important;transition:none!important}}
+
+/* Real screenshots: keep the complete screen visible without fake phone notches. */
+.kidneyos-site .ko-shot {
+  padding: 0;
+  border: 6px solid #153f3d;
+  background: #000;
+  border-radius: 30px;
+}
+
+.kidneyos-site .ko-shot--wide {
+  width: min(100%, 300px);
+  height: 570px;
+  border-radius: 30px;
+  transform: none;
+}
+
+.kidneyos-site .ko-shot__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center top;
+}
+
+@media (max-width: 720px) {
+  .kidneyos-site .ko-shot--wide {
+    width: min(100%, 260px);
+    height: 490px;
+  }
+}
