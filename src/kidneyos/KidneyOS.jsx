@@ -194,6 +194,7 @@ function useMeta(path) {
     setMeta('property', 'og:title', meta.title);
     setMeta('property', 'og:description', meta.description);
     setMeta('property', 'og:type', 'website');
+    setMeta('property', 'og:image', `${SITE_URL}${IMAGE_DIR}/icon.png`);
     setMeta('property', 'og:url', `${SITE_URL}${path}`);
 
     let canonical = document.head.querySelector('link[rel="canonical"]');
@@ -269,7 +270,13 @@ function Header() {
     <header className="ko-header">
       <div className="ko-container ko-header__content">
         <a href={ROOT} className="ko-logo" aria-label="KidneyOS home">
-          <span className="ko-mark">K</span>
+          <img
+            className="ko-mark"
+            src={`${IMAGE_DIR}/icon.png`}
+            alt=""
+            width="40"
+            height="40"
+          />
           <span>
             Kidney<span className="ko-logo__os">OS</span>
           </span>
@@ -301,7 +308,13 @@ function Footer() {
         <div className="ko-footer__top">
           <div>
             <a className="ko-logo" href={ROOT}>
-              <span className="ko-mark">K</span>
+              <img
+            className="ko-mark"
+            src={`${IMAGE_DIR}/icon.png`}
+            alt=""
+            width="40"
+            height="40"
+          />
               <span>KidneyOS</span>
             </a>
             <p>Care, made easier to organize.</p>
