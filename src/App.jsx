@@ -240,9 +240,7 @@ function BtownLabsLandingPage() {
                 practical strategy, and strong product instincts.
               </p>
               <p className="mt-5 leading-8 text-zinc-400">
-                The brand is built around sharp thinking, clean execution, and
-                solutions that create leverage. The goal is simple: build
-                technology that helps clients move faster, operate better, and
+                The goal is simple: build technology that helps clients move faster, operate better, and
                 look more polished while doing it.
               </p>
             </div>
@@ -260,8 +258,7 @@ function BtownLabsLandingPage() {
               </h2>
               <p className="mt-4 text-zinc-400 leading-8">
                 Let’s talk about what you’re building and where Btown Labs can
-                help. Replace this section with your email address, scheduling
-                link, or intake form when you’re ready.
+                help. 
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                 <a
