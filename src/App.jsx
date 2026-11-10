@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import Bendword from "./bendword/Bendword";
 import KidneyOS from "./kidneyos/KidneyOS";
 import PrivacyIndex from "./pages/PrivacyIndex";
 import PrivacyPillLedger from "./pages/PrivacyPillLedger";
@@ -79,6 +80,9 @@ function BtownLabsLandingPage() {
             <a href="/kidneyos" className="transition hover:text-white">
               KidneyOS
             </a>
+            <a href="/bendword" className="transition hover:text-white">
+              Bendword
+            </a>
             <a href="#services" className="transition hover:text-white">
               Services
             </a>
@@ -129,6 +133,10 @@ function BtownLabsLandingPage() {
             <p className="mt-6 text-sm text-zinc-300">
               Looking for our kidney-care tracking app?{" "}
               <a href="/kidneyos" className="font-semibold text-cyan-300 underline underline-offset-4 hover:text-cyan-200">Explore KidneyOS →</a>
+            </p>
+            <p className="mt-2 text-sm text-zinc-300">
+              Like daily word puzzles?{" "}
+              <a href="/bendword" className="font-semibold text-cyan-300 underline underline-offset-4 hover:text-cyan-200">Try Bendword →</a>
             </p>
             <div className="mt-10 grid gap-3 text-sm text-zinc-400 sm:grid-cols-2">
               {pillars.map((item) => (
@@ -294,6 +302,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<BtownLabsLandingPage />} />
+      <Route path="/bendword" element={<Bendword />} />
+      <Route path="/bendword/index.html" element={<Bendword />} />
       <Route path="/kidneyos" element={<KidneyOS />} />
       <Route path="/kidneyos/renal-diet-tracker" element={<KidneyOS />} />
       <Route path="/kidneyos/dialysis-tracker" element={<KidneyOS />} />
