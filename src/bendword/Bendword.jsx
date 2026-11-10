@@ -80,7 +80,7 @@ export default function Bendword() {
         <section className="bw-wrap bw-hero">
           <div className="bw-intro">
             <p className="bw-label"><span className="bw-dot" /> THE DAILY WORD PUZZLE</p>
-            <h1>Words don’t<br />go straight<span>.</span></h1>
+            <h1>One word leads to another</h1>
             <p className="bw-lede">Bend one word into another. Follow clues, swap letters, and spot surprising connections along the way.</p>
             <div className="bw-actions">
               <a className="bw-button" href={appStore}>Get Bendword free <span aria-hidden="true">↗</span></a>
