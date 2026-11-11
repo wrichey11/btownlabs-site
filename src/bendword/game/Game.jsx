@@ -7,6 +7,7 @@ import {
   totalMisses,
 } from './engine';
 import { introSeen, loadDailyPuzzle, loadSave, markIntroSeen, writeSave } from './data';
+import { track, trackOpen } from './analytics';
 import './game.css';
 
 const STATUS_LABEL = { solved: 'solved', hinted: 'solved with a hint', revealed: 'revealed' };
@@ -120,6 +121,15 @@ function useBendword(puzzle, active) {
     return statsAfterStarting(currentStats, puzzle);
   }
 
+  const startSent = useRef(false);
+  function markStarted() {
+    if (!startSent.current && !stats.playedPuzzleIDs.includes(puzzle.id)) {
+      startSent.current = true;
+      track('start', { puzzle: puzzleNumber(puzzle) });
+    }
+    setSave((s) => ({ ...s, stats: withStarted(s.stats) }));
+  }
+
   function solve(a, index, revealed) {
     const existing = a.slotStatuses[index] ?? 'unsolved';
     let next = {
@@ -148,8 +158,17 @@ function useBendword(puzzle, active) {
         const today = dayKey(now);
         // Finishing yesterday's daily after midnight doesn't count toward today's streak.
         const isDaily = puzzle.date === today;
-        const finished = next;
-        setSave((s) => ({ ...s, stats: statsAfterCompleting(withStarted(s.stats), puzzle, finished, { isDaily, today }) }));
+        const nextStats = statsAfterCompleting(withStarted(save.stats), puzzle, next, { isDaily, today });
+        setSave((s) => ({ ...s, stats: nextStats }));
+        track('solve', {
+          puzzle: puzzleNumber(puzzle),
+          secs: next.elapsedActiveTime,
+          hints: next.hintsUsed,
+          reveals: next.revealsUsed,
+          misses: totalMisses(next),
+          perfect: isPerfect(next),
+          streak: currentStreak(nextStats, today),
+        });
       }
     } else {
       const open = firstOpenSlot(puzzle, next, index);
@@ -175,7 +194,7 @@ function useBendword(puzzle, active) {
       clueHidden: isClueHidden(index),
     });
     if (outcome.kind === 'empty') return;
-    setSave((s) => ({ ...s, stats: withStarted(s.stats) }));
+    markStarted();
 
     if (outcome.kind === 'correct') {
       const clean = (attempt.slotStatuses[index] ?? 'unsolved') === 'unsolved' && (attempt.misses[index] ?? 0) === 0;
@@ -196,7 +215,7 @@ function useBendword(puzzle, active) {
   function takeHint() {
     if (!canUseHint) return;
     const index = selected;
-    setSave((s) => ({ ...s, stats: withStarted(s.stats) }));
+    markStarted();
     setAttempt((a) => ({
       ...a,
       hintLevels: { ...a.hintLevels, [index]: (a.hintLevels[index] ?? 0) + 1 },
@@ -209,7 +228,7 @@ function useBendword(puzzle, active) {
   function reveal() {
     if (!hasOpenSelection) return;
     const index = selected;
-    setSave((s) => ({ ...s, stats: withStarted(s.stats) }));
+    markStarted();
     setGuess('');
     setFeedback({ text: `Revealed ${display(puzzle.steps[index].answer)}.`, tone: 'info', id: Date.now() });
     setAttempt(solve({ ...attempt, revealsUsed: attempt.revealsUsed + 1 }, index, true));
@@ -384,6 +403,7 @@ function Result({ game }) {
   const firstTry = firstTryCount(attempt, indices);
 
   async function share() {
+    track('share', { puzzle: puzzleNumber(puzzle) });
     try {
       if (navigator.share && window.matchMedia('(pointer: coarse)').matches) {
         await navigator.share({ text });
@@ -447,6 +467,8 @@ function Board({ puzzle }) {
   const game = useBendword(puzzle, !showIntro);
   const inputRef = useRef(null);
   const closeIntro = () => { markIntroSeen(); setShowIntro(false); };
+  const openStreak = currentStreak(game.stats);
+  useEffect(() => { trackOpen(openStreak); }, [openStreak]);
   const today = dayKey();
 
   useEffect(() => {

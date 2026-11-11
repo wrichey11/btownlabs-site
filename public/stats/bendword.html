@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Bendword stats</title>
+<style>
+  :root {
+    --surface: #fcfcfb; --card: #ffffff; --ink: #1a1a19; --ink-2: #5d5c56; --line: #e6e4dc; --grid: #efede6;
+    --s1: #2a78d6; --s2: #eb6834; --accent: #00624d;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  [hidden] { display: none !important; }
+  body { font: 15px/1.45 ui-sans-serif, system-ui, -apple-system, sans-serif; background: var(--surface); color: var(--ink); }
+  main { max-width: 1080px; margin: 0 auto; padding: 28px 20px 60px; display: grid; gap: 22px; }
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  h1 { font-size: 22px; letter-spacing: -.02em; flex: 1; }
+  h2 { font-size: 15px; margin-bottom: 10px; }
+  .muted { color: var(--ink-2); font-size: 13px; }
+  select, button, input { font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: white; }
+  button { cursor: pointer; }
+  button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 12px; }
+  .tile, .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .tile .k { font-size: 12px; color: var(--ink-2); }
+  .tile .v { font-size: 28px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .tile .d { font-size: 12px; color: var(--ink-2); }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--grid); }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-weight: 600; color: var(--ink-2); }
+  .scroll { max-height: 360px; overflow: auto; }
+  .legend { display: flex; gap: 16px; font-size: 13px; color: var(--ink-2); margin-bottom: 6px; }
+  .legend span::before { content: ""; display: inline-block; width: 12px; height: 2px; margin-right: 6px; vertical-align: middle; background: var(--c); }
+  .chart { position: relative; }
+  .tip { position: absolute; pointer-events: none; background: var(--ink); color: white; font-size: 12px; padding: 6px 8px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, -100%); display: none; }
+  #login { max-width: 420px; display: grid; gap: 10px; }
+  #app { display: grid; gap: 16px; }
+  .error { color: #b8392a; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Bendword stats</h1>
+    <select id="range" aria-label="Date range"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select>
+    <button id="refresh">Refresh</button>
+    <button id="logout" title="Forget the key on this browser">Sign out</button>
+  </header>
+
+  <form id="login" class="card" hidden>
+    <h2>Enter your stats key</h2>
+    <p class="muted">The STATS_KEY secret you set in Cloudflare. It's kept in this browser only.</p>
+    <input id="key" type="password" autocomplete="current-password" required />
+    <button class="primary">Show stats</button>
+    <p id="loginError" class="error"></p>
+  </form>
+
+  <div id="app" hidden>
+    <section class="tiles" id="tiles"></section>
+    <section class="card">
+      <h2>Daily players</h2>
+      <p class="muted">Devices that opened the game each full puzzle day (days start at midnight Eastern). Today is in the table below.</p>
+      <div class="legend"><span style="--c: var(--s1)">Web</span><span style="--c: var(--s2)">iPhone app</span></div>
+      <div class="chart" id="chart"><div class="tip" id="tip"></div></div>
+    </section>
+    <section class="grid2">
+      <div class="card"><h2>Retention</h2><p class="muted">Share of new players who came back on exactly that day, from cohorts that have had time to return.</p><table id="retention"></table></div>
+      <div class="card"><h2>Where new players came from</h2><table id="sources"></table></div>
+    </section>
+    <section class="card"><h2>By day</h2><div class="scroll"><table id="days"></table></div></section>
+    <section class="grid2">
+      <div class="card"><h2>Daily puzzles</h2><div class="scroll"><table id="puzzles"></table></div></div>
+      <div class="card"><h2>Countries</h2><table id="countries"></table></div>
+    </section>
+    <p class="muted" id="footnote"></p>
+  </div>
+</main>
+<script>
+const KEY = 'bendword.statsKey';
+const $ = (id) => document.getElementById(id);
+const fmt = (n) => (n == null || Number.isNaN(n) ? '–' : Math.round(n).toLocaleString('en-US'));
+const pct = (n) => (n == null || !Number.isFinite(n) ? '–' : `${Math.round(n * 100)}%`);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const addDays = (day, n) => { const [y, m, d] = day.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); };
+const label = (day) => { const [, m, d] = day.split('-').map(Number); return `${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m - 1]} ${d}`; };
+const secs = (s) => (s == null ? '–' : `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`);
+
+function table(el, head, rows) {
+  el.innerHTML = `<thead><tr>${head.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${
+    rows.length ? rows.map((r) => `<tr>${r.map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')
+      : `<tr><td colspan="${head.length}" class="muted">No data yet</td></tr>`}</tbody>`;
+}
+
+async function load() {
+  const key = localStorage.getItem(KEY);
+  if (!key) { $('login').hidden = false; $('app').hidden = true; return; }
+  const res = await fetch(`/api/stats?days=${$('range').value}`, { headers: { authorization: `Bearer ${key}` } });
+  if (res.status === 401) { localStorage.removeItem(KEY); $('loginError').textContent = 'That key didn’t work.'; $('login').hidden = false; $('app').hidden = true; return; }
+  if (!res.ok) { $('loginError').textContent = `Stats failed to load (${res.status}).`; $('login').hidden = false; return; }
+  $('login').hidden = true; $('app').hidden = false;
+  render(await res.json());
+}
+
+let lastData = null;
+function render(data) {
+  lastData = data;
+  const { today, from, daily, newPlayers, returns, sources, puzzles, countries } = data;
+  const days = [];
+  for (let d = from; d <= today; d = addDays(d, 1)) days.push(d);
+  const count = (day, event, platform) => daily.filter((r) => r.day === day && r.event === event && (!platform || r.platform === platform)).reduce((a, r) => a + r.n, 0);
+  const newOn = (day) => newPlayers.filter((r) => r.day === day).reduce((a, r) => a + r.n, 0);
+  const sum = (list, f) => list.reduce((a, d) => a + f(d), 0);
+
+  // Retention: returns on day c+N with since_first = N, over new players on day c, for cohorts that have matured.
+  const retention = (n, window) => {
+    let back = 0, base = 0;
+    for (let i = 1; i <= window; i++) {
+      const cohort = addDays(today, -(n + i));
+      base += newOn(cohort);
+      back += returns.filter((r) => r.day === addDays(cohort, n) && r.since_first === n).reduce((a, r) => a + r.n, 0);
+    }
+    return { rate: base ? back / base : null, base };
+  };
+  const d1 = retention(1, 7), d7 = retention(7, 7), d30 = retention(30, 7);
+  const last7 = days.slice(-8, -1); // the last 7 full days; today is still in progress
+  const solves7 = sum(last7, (d) => count(d, 'solve')), shares7 = sum(last7, (d) => count(d, 'share'));
+  const players7 = sum(last7, (d) => count(d, 'open'));
+
+  $('tiles').innerHTML = [
+    ['Players today', fmt(count(today, 'open')), `${fmt(newOn(today))} new`],
+    ['Avg daily players, last 7 days', fmt(players7 / 7), `${fmt(sum(last7, newOn))} new players`],
+    ['Solve rate, 7 days', pct(sum(last7, (d) => count(d, 'start')) ? solves7 / sum(last7, (d) => count(d, 'start')) : null), `${fmt(solves7)} solves`],
+    ['Shares per solve, 7 days', pct(solves7 ? shares7 / solves7 : null), `${fmt(shares7)} shares`],
+    ['Day 1 retention', pct(d1.rate), `from ${fmt(d1.base)} new players`],
+    ['Day 7 retention', pct(d7.rate), `from ${fmt(d7.base)} new players`],
+    ['Day 30 retention', pct(d30.rate), `from ${fmt(d30.base)} new players`],
+  ].map(([k, v, d]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join('');
+
+  // Today is still in progress, so the chart stops at yesterday; the table below includes today.
+  drawChart(days.slice(0, -1).map((d) => ({ day: d, web: count(d, 'open', 'web'), ios: count(d, 'open', 'ios') })));
+
+  table($('retention'), ['Return day', 'Last 7 cohorts', 'Last 28 cohorts'],
+    [1, 7, 30].map((n) => [`Day ${n}`, pct(retention(n, 7).rate), pct(retention(n, 28).rate)]));
+  const totalNew = sum(sources, (s) => s.n);
+  table($('sources'), ['Source', 'New players', 'Share'], sources.map((s) => [s.src, fmt(s.n), pct(s.n / totalNew)]));
+  table($('days'), ['Day', 'Players', 'New', 'Web', 'App', 'Started', 'Solved', 'Shared'],
+    [...days].reverse().map((d) => [label(d), fmt(count(d, 'open')), fmt(newOn(d)), fmt(count(d, 'open', 'web')), fmt(count(d, 'open', 'ios')),
+      fmt(count(d, 'start')), fmt(count(d, 'solve')), fmt(count(d, 'share'))]));
+  table($('puzzles'), ['Puzzle', 'Started', 'Solve rate', 'Avg time', 'Avg hints', 'Shares'],
+    puzzles.map((p) => [`#${p.puzzle}`, fmt(p.starts), pct(p.starts ? p.solves / p.starts : null), secs(p.avg_secs), p.avg_hints ?? '–', fmt(p.shares)]));
+  table($('countries'), ['Country', 'Opens'], countries.map((c) => [c.country.toUpperCase(), fmt(c.n)]));
+  $('footnote').textContent = `${label(from)} to ${label(today)}. No personal data is stored: no IDs, IP addresses, or device identifiers.`;
+}
+
+function drawChart(rows) {
+  const box = $('chart');
+  box.querySelectorAll('svg').forEach((s) => s.remove());
+  if (!rows.length) return;
+  const W = box.clientWidth || 800, H = 240, L = 40, R = 70, T = 12, B = 26;
+  const max = Math.max(4, ...rows.map((r) => Math.max(r.web, r.ios)));
+  const step = Math.pow(10, Math.floor(Math.log10(max))), top = Math.ceil(max / step) * step;
+  const x = (i) => L + (rows.length === 1 ? 0 : (i / (rows.length - 1)) * (W - L - R));
+  const y = (v) => T + (1 - v / top) * (H - T - B);
+  const ticks = [0, top / 2, top];
+  const line = (k) => rows.map((r, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(r[k]).toFixed(1)}`).join('');
+  const every = Math.ceil(rows.length / 8);
+  const last = rows.length - 1;
+  const svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily players by platform">
+    ${ticks.map((t) => `<line x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)"/><text x="${L - 6}" y="${y(t) + 4}" text-anchor="end" font-size="11" fill="var(--ink-2)">${fmt(t)}</text>`).join('')}
+    ${rows.map((r, i) => ((i % every === 0 && last - i >= every / 2) || i === last) ? `<text x="${x(i)}" y="${H - 6}" text-anchor="middle" font-size="11" fill="var(--ink-2)">${label(r.day)}</text>` : '').join('')}
+    <path d="${line('web')}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round"/>
+    <path d="${line('ios')}" fill="none" stroke="var(--s2)" stroke-width="2" stroke-linejoin="round"/>
+    <text x="${x(last) + 8}" y="${y(rows[last].web) + 4}" font-size="12" fill="var(--ink)">Web ${fmt(rows[last].web)}</text>
+    <text x="${x(last) + 8}" y="${y(rows[last].ios) + 4 + (Math.abs(y(rows[last].ios) - y(rows[last].web)) < 14 ? (rows[last].ios <= rows[last].web ? 14 : -14) : 0)}" font-size="12" fill="var(--ink)">App ${fmt(rows[last].ios)}</text>
+    <line id="cross" y1="${T}" y2="${H - B}" stroke="var(--ink-2)" stroke-dasharray="3 3" visibility="hidden"/>
+    <rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="transparent" id="hit"/>
+  </svg>`;
+  box.insertAdjacentHTML('afterbegin', svg);
+  const tip = $('tip'), cross = box.querySelector('#cross');
+  box.querySelector('#hit').addEventListener('mousemove', (e) => {
+    const rect = box.getBoundingClientRect();
+    const i = Math.max(0, Math.min(last, Math.round(((e.clientX - rect.left - L) / (W - L - R)) * last)));
+    const r = rows[i];
+    cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('visibility', 'visible');
+    tip.style.display = 'block'; tip.style.left = `${x(i)}px`; tip.style.top = `${y(Math.max(r.web, r.ios)) - 6}px`;
+    tip.textContent = `${label(r.day)} · Web ${fmt(r.web)} · App ${fmt(r.ios)} · Total ${fmt(r.web + r.ios)}`;
+  });
+  box.querySelector('#hit').addEventListener('mouseleave', () => { tip.style.display = 'none'; cross.setAttribute('visibility', 'hidden'); });
+}
+
+$('login').addEventListener('submit', (e) => { e.preventDefault(); localStorage.setItem(KEY, $('key').value.trim()); $('loginError').textContent = ''; load(); });
+$('refresh').addEventListener('click', load);
+$('range').addEventListener('change', load);
+$('logout').addEventListener('click', () => { localStorage.removeItem(KEY); load(); });
+window.addEventListener('resize', () => { if (lastData && !$('app').hidden) render(lastData); });
+load();
+</script>
+</body>
+</html>

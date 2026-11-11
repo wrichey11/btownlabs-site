@@ -6,28 +6,44 @@ export default function PrivacyBendword() {
     <main style={styles.main}>
       <h1 style={styles.h1}>Bendword Privacy Policy</h1>
 
-      <p style={styles.updated}>Last updated: October 2026</p>
+      <p style={styles.updated}>Last updated: November 2026</p>
 
       <p style={styles.p}>
         Bendword is a daily word transformation puzzle game developed by
-        Btown Labs, LLC. We respect your privacy and are committed to
-        protecting your information.
+        Btown Labs, LLC, available as an iPhone and iPad app and on the web
+        at btownlabs.com/bendword. We respect your privacy and are committed
+        to protecting your information.
       </p>
 
       <Section title="Data we collect">
-        Bendword does not collect personal information. Game progress,
-        scores, streaks, statistics, and preferences are stored locally
-        on your device.
+        Bendword does not collect personal information. There are no accounts,
+        and we never collect your name, email address, contacts, location,
+        advertising identifier, or any other identifier for you or your device.
+        Game progress, streaks, statistics, and preferences are stored locally
+        on your device (in the app) or in your browser (on the web).
       </Section>
 
-      <Section title="Data that leaves your device">
-        Bendword does not transmit gameplay data or personal information
-        to Btown Labs or third-party servers.
+      <Section title="Anonymous usage statistics">
+        To understand how many people play and which puzzles work well,
+        Bendword sends a small anonymous message to Btown Labs when you open
+        the game for the first time each day, start a puzzle, solve a puzzle,
+        or share a result. Each message contains only: the event, the puzzle
+        number, whether you played on the web or the app, the app version,
+        simple game counts (solve time, hints, reveals, wrong guesses, and
+        streak), how many days you have played, how many days since you first
+        played, and for the daily open, the website or link that brought you
+        to Bendword. Cloudflare, which hosts our website, adds the country the
+        request came from. We do not store IP addresses, and the messages
+        contain no identifier, so they cannot be linked to you or to each
+        other. In the app, you can turn this off in Settings under
+        “Share Anonymous Usage Stats.”
       </Section>
 
       <Section title="Third-party services">
-        Bendword does not use third-party analytics, advertising networks,
-        tracking technologies, or external data collection services.
+        Bendword does not use third-party analytics, advertising networks, or
+        tracking technologies. Our website and the anonymous statistics above
+        are hosted by Cloudflare, which processes requests on our behalf. The
+        website does not use cookies.
       </Section>
 
       <Section title="Data sharing">
@@ -37,13 +53,16 @@ export default function PrivacyBendword() {
 
       <Section title="Data retention and deletion">
         Game progress and preferences are stored locally on your device.
-        You can remove locally stored application data by deleting
-        Bendword, subject to any backups maintained by your device.
+        You can remove them by deleting the app, subject to any backups
+        maintained by your device, or by clearing website data for
+        btownlabs.com in your browser. Anonymous usage statistics cannot be
+        linked to you, so they cannot be retrieved or deleted for a specific
+        person.
       </Section>
 
       <Section title="Children">
-        Bendword does not knowingly collect personal information
-        from children or adults.
+        Bendword does not collect personal information from anyone,
+        including children.
       </Section>
 
       <Section title="Changes to this policy">
