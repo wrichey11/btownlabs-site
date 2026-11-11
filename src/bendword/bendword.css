@@ -84,3 +84,5 @@
   .bw-check span { display: none; }
   .bw-clue .bw-label { letter-spacing: .04em; }
 }
+.bw-play { padding-block: clamp(1.25rem, 4vw, 2.75rem) clamp(2.5rem, 6vw, 4.5rem); }
+.bw-play-label { width: min(100%, 38rem); margin: 0 auto 1rem; }

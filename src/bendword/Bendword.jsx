@@ -1,64 +1,8 @@
-import { useState } from 'react';
+import Game from './game/Game';
 import './bendword.css';
 
 const appStore = 'https://apps.apple.com/app/bendword/id6827767246';
 const media = '/images/bendword/';
-
-function SampleBend() {
-  const [guess, setGuess] = useState('');
-  const [state, setState] = useState('ready');
-  const [hint, setHint] = useState(false);
-
-  function check(event) {
-    event.preventDefault();
-    if (!guess.trim()) return;
-    setState(guess.trim().toUpperCase() === 'POWER' ? 'solved' : 'retry');
-  }
-
-  return (
-    <section className="bw-sample" id="try" aria-labelledby="bw-sample-title">
-      <header className="bw-sample-head">
-        <div>
-          <p className="bw-label">ARCHIVE PUZZLE 255</p>
-          <h2 id="bw-sample-title">Try a bend</h2>
-        </div>
-        <span className="bw-sample-tag">1 of 5</span>
-      </header>
-      <div className="bw-wordpath" aria-label="Start: TOWER. Goal: END.">
-        <div><span>START</span><strong>TOWER</strong></div>
-        <span className="bw-arrow" aria-hidden="true">→</span>
-        <div><span>GOAL</span><strong>END</strong></div>
-      </div>
-      <div className="bw-clue">
-        <p className="bw-label">FIRST BEND · CHANGE ONE LETTER</p>
-        <p id="bw-clue-text">Energy</p>
-      </div>
-      {state === 'solved' ? (
-        <div className="bw-solved" role="status">
-          <strong>✓ TOWER → POWER</strong>
-          <span>Swap T for P. One bend down!</span>
-        </div>
-      ) : (
-        <form className="bw-form" onSubmit={check}>
-          <label htmlFor="bw-guess">What word comes next?</label>
-          <div className="bw-inputrow">
-            <input id="bw-guess" value={guess} onChange={(event) => {
-              setGuess(event.target.value);
-              setState('ready');
-            }} placeholder="Type a word" autoComplete="off" autoCapitalize="characters" spellCheck={false} maxLength={24} aria-describedby="bw-clue-text bw-feedback" />
-            <button className="bw-button bw-check" type="submit">Check <span aria-hidden="true">↵</span></button>
-          </div>
-          <div className="bw-feedback">
-            <p id="bw-feedback" role="status">{state === 'retry' ? 'Try a word that means energy.' : hint ? 'Hint: it starts with P.' : 'Keep the other four letters in place.'}</p>
-            <button type="button" onClick={() => { setHint(!hint); setState('ready'); }} aria-pressed={hint}>
-              {hint ? 'Hide hint' : 'Get a hint'}
-            </button>
-          </div>
-        </form>
-      )}
-    </section>
-  );
-}
 
 export default function Bendword() {
   return (
@@ -70,25 +14,16 @@ export default function Bendword() {
             <img src={media + 'icon.png'} alt="" width="42" height="42" /> Bendword
           </a>
           <nav aria-label="Bendword">
-            <a className="bw-nav-link" href="#gameplay">Gameplay</a>
+            <a className="bw-nav-link" href="#gameplay">How it works</a>
             <a className="bw-button bw-nav-store" href={appStore}>App Store <span aria-hidden="true">↗</span></a>
           </nav>
         </div>
       </header>
 
       <main id="bw-main">
-        <section className="bw-wrap bw-hero">
-          <div className="bw-intro">
-            <p className="bw-label"><span className="bw-dot" /> THE DAILY WORD PUZZLE</p>
-            <h1>One word leads to another</h1>
-            <p className="bw-lede">Bend one word into another. Follow clues, swap letters, and spot surprising connections along the way.</p>
-            <div className="bw-actions">
-              <a className="bw-button" href={appStore}>Get Bendword free <span aria-hidden="true">↗</span></a>
-              <a className="bw-textlink" href="#gameplay">Watch a solve <span aria-hidden="true">↓</span></a>
-            </div>
-            <p className="bw-availability">For iPhone and iPad · No account needed</p>
-          </div>
-          <SampleBend />
+        <section className="bw-wrap bw-play" aria-label="Today's puzzle">
+          <p className="bw-label bw-play-label"><span className="bw-dot" /> THE DAILY WORD PUZZLE</p>
+          <Game />
         </section>
 
         <section id="gameplay" className="bw-gameplay" aria-labelledby="bw-gameplay-title">
@@ -115,7 +50,7 @@ export default function Bendword() {
 
         <section className="bw-wrap bw-last">
           <img src={media + 'icon.png'} alt="" width="68" height="68" loading="lazy" />
-          <div><h2>A new bend every day.</h2><p>Play today’s puzzle or explore the archive.</p></div>
+          <div><h2>A new bend every day.</h2><p>Keep your streak going with the archive, reminders, and stats in the app.</p></div>
           <a className="bw-button" href={appStore}>Get it on the App Store <span aria-hidden="true">↗</span></a>
         </section>
       </main>
