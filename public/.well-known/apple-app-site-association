@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["AR5U78HA8F.com.830.btownlabs.Bendword"],
+        "components": [
+          { "/": "/bendword", "comment": "Today's puzzle, including shared links like /bendword?src=share" },
+          { "/": "/bendword/", "comment": "Same page with a trailing slash" }
+        ]
+      }
+    ]
+  }
+}

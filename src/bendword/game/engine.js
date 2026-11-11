@@ -2,7 +2,7 @@
 // Sources: StringUtilities, TransformationType, TransformationValidator, GuessEvaluator,
 // Puzzle, PuzzleService, StatsService, ShareService, and GameViewModel.
 
-export const SHARE_URL = 'https://btownlabs.com/bendword';
+export const SHARE_URL = 'https://btownlabs.com/bendword?src=share';
 export const APP_STORE_URL = 'https://apps.apple.com/app/bendword/id6827767246';
 
 /** First letter, letter count, extra clue. */
