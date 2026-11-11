@@ -126,14 +126,17 @@ function render(data) {
   };
   const d1 = retention(1, 7), d7 = retention(7, 7), d30 = retention(30, 7);
   const last7 = days.slice(-8, -1); // the last 7 full days; today is still in progress
-  const solves7 = sum(last7, (d) => count(d, 'solve')), shares7 = sum(last7, (d) => count(d, 'share'));
+  // Rates include today (a partial day doesn't skew a ratio); the player average uses full days only.
+  const recent7 = days.slice(-7);
+  const solves7 = sum(recent7, (d) => count(d, 'solve')), shares7 = sum(recent7, (d) => count(d, 'share'));
+  const starts7 = sum(recent7, (d) => count(d, 'start'));
   const players7 = sum(last7, (d) => count(d, 'open'));
 
   $('tiles').innerHTML = [
     ['Players today', fmt(count(today, 'open')), `${fmt(newOn(today))} new`],
-    ['Avg daily players, last 7 days', fmt(players7 / 7), `${fmt(sum(last7, newOn))} new players`],
-    ['Solve rate, 7 days', pct(sum(last7, (d) => count(d, 'start')) ? solves7 / sum(last7, (d) => count(d, 'start')) : null), `${fmt(solves7)} solves`],
-    ['Shares per solve, 7 days', pct(solves7 ? shares7 / solves7 : null), `${fmt(shares7)} shares`],
+    ['Avg daily players, last 7 full days', fmt(players7 / 7), `${fmt(sum(last7, newOn))} new players (excl. today)`],
+    ['Solve rate, last 7 days', pct(starts7 ? solves7 / starts7 : null), `${fmt(solves7)} solves, incl. today`],
+    ['Shares per solve, last 7 days', pct(solves7 ? shares7 / solves7 : null), `${fmt(shares7)} shares, incl. today`],
     ['Day 1 retention', pct(d1.rate), `from ${fmt(d1.base)} new players`],
     ['Day 7 retention', pct(d7.rate), `from ${fmt(d7.base)} new players`],
     ['Day 30 retention', pct(d30.rate), `from ${fmt(d30.base)} new players`],
