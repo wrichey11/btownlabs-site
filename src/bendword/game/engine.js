@@ -461,7 +461,9 @@ export function shareText(puzzle, attempt, stats, today = dayKey()) {
   const streak = currentStreak(stats, today);
   if (streak > 1) lines.push(`🔥 ${streak}-day streak`);
   lines.push('Bend one word into another.');
-  lines.push('A BtownLabs game');
+  // Keep the URL inside the shared text instead of at the end, where Messages promotes it into a
+  // separate, oversized link preview.
   lines.push(SHARE_URL);
+  lines.push('A BtownLabs game');
   return lines.join('\n');
 }

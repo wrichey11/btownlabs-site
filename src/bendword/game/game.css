@@ -62,15 +62,26 @@
 .bwg-rule strong { font: 720 .7rem ui-monospace, monospace; letter-spacing: .1em; text-transform: uppercase; }
 .bwg-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: .35rem; }
 .bwg-chips li { padding: .2rem .55rem; border-radius: 999px; background: #fbe9d2; color: #7a4510; font-size: .78rem; font-weight: 700; }
-.bwg-form { display: flex; gap: .5rem; }
-.bwg-form input {
-  flex: 1; min-width: 0; padding: .7rem .85rem; border: 1.5px solid #a8b9aa; border-radius: .65rem; background: white;
-  font-size: 1.15rem; font-weight: 750; letter-spacing: .06em; text-transform: uppercase;
+.bwg-guess-wrap { position: relative; }
+.bwg-guess {
+  display: flex; align-items: center; gap: 2px; height: 48px; padding: 0 12px; border: 1.5px solid #a8b9aa; border-radius: .65rem;
+  background: white; overflow: hidden; white-space: nowrap;
+  font: 800 1.25rem/1 ui-rounded, ui-sans-serif, system-ui, sans-serif; letter-spacing: .02em; color: var(--bw-ink);
 }
-.bwg-form input::placeholder { text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 1rem; color: #7d8b80; }
-.bwg-form input:focus { outline: 3px solid #0c8b72; outline-offset: 1px; }
-.bwg-form input.is-shaking-0 { animation: bwg-shake-0 .32s ease-in-out; }
-.bwg-form input.is-shaking-1 { animation: bwg-shake-1 .32s ease-in-out; }
+.bwg-guess.is-warning { border-color: #c98a80; }
+.bwg-guess.is-success { border-color: #6fae95; }
+.bwg-placeholder { font-size: 1rem; font-weight: 600; letter-spacing: 0; color: #7d8b80; }
+.bwg-caret { flex: 0 0 2px; width: 2px; height: 24px; border-radius: 1px; background: var(--bw-green); animation: bwg-blink 1.1s steps(1) infinite; }
+.bwg-places { display: flex; align-items: center; height: 100%; }
+.bwg-place { position: relative; flex: 0 0 auto; display: grid; place-items: center; height: 100%; }
+.bwg-place i {
+  position: absolute; left: 0; right: 0; top: calc(50% + 14px - 1.25px); height: 2.5px; border-radius: 2px;
+  background: #9aa59d; opacity: 0; transform: scaleX(.2); transition: opacity .2s, transform .25s cubic-bezier(.3, 1.6, .5, 1);
+}
+.bwg-place i.is-next { background: var(--bw-green); }
+.bwg-place i.is-shown { opacity: 1; transform: none; }
+.bwg-guess.is-shaking-0 { animation: bwg-shake-0 .32s ease-in-out; }
+.bwg-guess.is-shaking-1 { animation: bwg-shake-1 .32s ease-in-out; }
 .bwg-feedback { min-height: 1.3rem; font-size: .9rem; font-weight: 600; text-align: center; }
 .bwg-feedback.is-success { color: var(--bw-green); }
 .bwg-feedback.is-warning { color: #9a3412; }
@@ -115,6 +126,64 @@
 .bwg-why { grid-column: 2; margin-top: .15rem; font-size: .8rem; line-height: 1.4; color: var(--bw-muted); }
 .bwg-word.is-target .bwg-why { color: #c9ded0; }
 
+.bwg-word.is-target.is-reached { background: var(--bwg-card); color: var(--bw-ink); border: 2px solid var(--bw-green); }
+.bwg-word.is-target.is-reached .bwg-tag { color: var(--bw-green); }
+.bwg-word.is-target.is-reached .bwg-why { color: var(--bw-muted); }
+.bwg-reached { margin-left: .55rem; padding: .15rem .45rem; border-radius: 999px; background: #00624d1f; color: var(--bw-green); font: 800 .62rem ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; vertical-align: .2em; }
+
+/* Bendword keyboard (mirrors the iOS app's) */
+.bwg-keyboard { padding: 8px 6px 6px; border-radius: var(--bwg-radius); background: #e6e0d6; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+.bwg-keys { --gap: 6px; --unit: calc((100% - 9 * var(--gap)) / 10); display: grid; gap: 10px; }
+.bwg-keyrow { display: flex; justify-content: center; gap: var(--gap); }
+.bwg-key {
+  position: relative; flex: 0 0 var(--unit); height: 50px; padding: 0; border: 0; border-radius: 7px; background: transparent;
+  color: var(--bw-ink); cursor: pointer; perspective: 110px; -webkit-tap-highlight-color: transparent;
+  transition: background-color .2s;
+}
+.bwg-key.is-enter, .bwg-key.is-action { flex-basis: calc(var(--unit) * 1.5 + var(--gap) / 2); }
+.bwg-keyface {
+  display: grid; place-items: center; width: 100%; height: 100%; border-radius: 7px; background: #fffdf9;
+  box-shadow: 0 1.5px 0 #0000002e; font: 750 1.2rem/1 ui-rounded, ui-sans-serif, system-ui, sans-serif;
+  transform-origin: 50% 100%; transition: transform .08s ease-out, background-color .08s, box-shadow .08s;
+}
+.bwg-key.is-enter .bwg-keyface { background: var(--bw-green); color: white; font-size: .8rem; font-weight: 850; letter-spacing: .02em; }
+.bwg-key.is-action .bwg-keyface { background: #c7c2b8; font-size: 1.15rem; }
+.bwg-key.is-hinted .bwg-keyface { background: #f6e3cb; box-shadow: inset 0 0 0 2px var(--bwg-hint), 0 1.5px 0 #0000002e; }
+.bwg-key.is-pressed .bwg-keyface { transform: scale(.94); box-shadow: none; background: #cfe3d6; }
+.bwg-key.is-enter.is-pressed .bwg-keyface { background: #337f6d; }
+.bwg-key.is-action.is-pressed .bwg-keyface { background: #fffdf9; }
+.bwg-key.is-hinted.is-pressed .bwg-keyface { background: #f0cfa6; }
+.bwg-key:disabled { cursor: default; }
+.bwg-key:disabled .bwg-keyface { opacity: .45; }
+.bwg-key:focus-visible { outline: 3px solid #0c8b72; outline-offset: 2px; }
+/* The key face flips open like a trapdoor, showing a dark hole underneath. */
+.bwg-key.is-open { background: #383630; }
+.bwg-key.is-open .bwg-keyface { transform: rotateX(72deg); transition: transform .22s cubic-bezier(.3, 1.4, .6, 1); }
+.bwg-key.is-open:disabled .bwg-keyface { opacity: 1; }
+
+/* Bendit settings */
+.bwg-prefs { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .35rem .5rem; font-size: .82rem; color: var(--bw-muted); font-weight: 650; }
+.bwg-prefs button { min-width: 2.6rem; padding: .2rem .55rem; border: 1px solid var(--bw-line); border-radius: 999px; background: white; font-weight: 750; color: var(--bw-muted); cursor: pointer; }
+.bwg-prefs button[aria-pressed='true'] { background: var(--bwg-soft); color: var(--bw-green); border-color: #9fc7b4; }
+.bwg-prefs button:disabled { opacity: .5; cursor: default; }
+.bwg-prefs small { flex-basis: 100%; text-align: center; font-weight: 500; }
+
+/* Bendit, drawn over the page */
+.bwg-mascot-layer {
+  --bwg-ink: #102821; --bwg-paper: #f7f4e9;
+  position: fixed; inset: 0; z-index: 40; overflow: hidden; pointer-events: none;
+}
+.bwg-mascot-stage { position: absolute; top: 0; left: 0; width: 0; height: 0; }
+.bwg-mascot-svg { position: absolute; top: 0; left: 0; overflow: visible; }
+.bwg-mascot-word { position: absolute; white-space: nowrap; font: 800 1.25rem/1 ui-rounded, ui-sans-serif, system-ui, sans-serif; letter-spacing: .02em; color: var(--bwg-ink); }
+.bwg-mascot-thought {
+  position: absolute; width: max-content; max-width: 200px; padding: 8px 12px; border: 1.5px solid var(--bwg-ink); border-radius: 14px;
+  background: #fffdf5; color: var(--bwg-ink); font: 650 .95rem/1.3 ui-sans-serif, system-ui, sans-serif; white-space: pre-line;
+  transform-origin: 0 100%;
+}
+.bwg-mascot-thought.is-left { transform-origin: 100% 100%; }
+.bwg-mascot-thought.is-mark { padding: 0; border: 0; background: none; font: 900 1.4rem/1 ui-rounded, ui-sans-serif, system-ui, sans-serif; color: var(--bwg-hint, #b86a12); }
+
 /* Result */
 .bwg-result { display: grid; gap: .75rem; text-align: center; border-color: var(--bw-green); }
 .bwg-result h2 { font-family: Georgia, serif; font-size: clamp(2.2rem, 7vw, 3rem); letter-spacing: -.05em; line-height: 1; }
@@ -144,9 +213,11 @@
 @keyframes bwg-in { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
 @keyframes bwg-shake-0 { 0%, 100% { transform: none; } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
 @keyframes bwg-shake-1 { 0%, 100% { transform: none; } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+@keyframes bwg-blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
 @keyframes bwg-pop { 0% { transform: scale(1); } 40% { transform: scale(1.03); } 100% { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) {
-  .bwg-card, .bwg-form input[class^='is-shaking'], .bwg-word.is-pop { animation: none; }
+  .bwg-card, .bwg-guess, .bwg-caret, .bwg-word.is-pop { animation: none !important; }
+  .bwg-keyface, .bwg-place i { transition: none; }
 }
 @media (max-width: 30rem) {
   .bwg-app { flex-wrap: wrap; }
