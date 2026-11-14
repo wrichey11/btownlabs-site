@@ -8,9 +8,6 @@ import {
 } from './engine';
 import { introSeen, loadDailyPuzzle, loadSave, markIntroSeen, writeSave } from './data';
 import { track, trackOpen } from './analytics';
-import Keyboard from './Keyboard';
-import Mascot from './Mascot';
-import { DELETE, ENTER, MAX_GUESS_LENGTH, keyForEvent } from './keys';
 import './game.css';
 
 const STATUS_LABEL = { solved: 'solved', hinted: 'solved with a hint', revealed: 'revealed' };
@@ -33,8 +30,6 @@ function useBendword(puzzle, active) {
   const [feedback, setFeedback] = useState(null);
   const [shake, setShake] = useState(0);
   const [justSolved, setJustSolved] = useState(null);
-  const [lastMiss, setLastMiss] = useState(null);
-  const [mascotEvent, setMascotEvent] = useState(null);
   const lastWrong = useRef({});
   const sessionStart = useRef(null);
   const [live, setLive] = useState(0);
@@ -85,18 +80,6 @@ function useBendword(puzzle, active) {
       window.clearInterval(timer);
     };
   }, [active, pause, resume]);
-
-  // Keep a running attempt no more than 15 seconds behind if the browser kills the tab.
-  useEffect(() => {
-    if (!active || completed) return undefined;
-    const checkpoint = window.setInterval(() => {
-      if (!latest.current) return;
-      const { save: s, attempt: a } = latest.current;
-      const running = sessionStart.current == null ? 0 : (Date.now() - sessionStart.current) / 1000;
-      writeSave({ attempts: { ...s.attempts, [puzzle.id]: { ...a, elapsedActiveTime: a.elapsedActiveTime + running } }, stats: s.stats });
-    }, 15000);
-    return () => window.clearInterval(checkpoint);
-  }, [active, completed, puzzle.id]);
 
   const elapsed = attempt.elapsedActiveTime + (completed ? 0 : live);
 
@@ -155,7 +138,6 @@ function useBendword(puzzle, active) {
       slotStatuses: { ...a.slotStatuses, [index]: revealed ? 'revealed' : existing === 'hinted' ? 'hinted' : 'solved' },
     };
     setJustSolved(index);
-    setMascotEvent({ id: Date.now(), kind: 'cheer', sound: 'pop', duration: 1500 });
     window.setTimeout(() => setJustSolved((s) => (s === index ? null : s)), 450);
     const solvedCount = indices.filter((i) => next.solvedSlots[i] != null).length;
     if (solvedCount === indices.length) {
@@ -227,15 +209,6 @@ function useBendword(puzzle, active) {
       setAttempt((a) => ({ ...a, guesses: a.guesses + 1, misses: { ...a.misses, [index]: (a.misses[index] ?? 0) + 1 } }));
     }
     setFeedback({ text: outcome.message, tone: 'warning', id: Date.now() });
-    setLastMiss({ ...outcome, word: guess, index, misses: (attempt.misses[index] ?? 0) + 1, id: Date.now() });
-    const misses = (attempt.misses[index] ?? 0) + 1;
-    const close = ['fitsRuleButNotIt', 'fitsRuleButNotLinked'].includes(outcome.kind);
-    const facepalm = misses >= 3 && misses % 3 === 0;
-    setMascotEvent({ id: Date.now(), kind: facepalm ? 'facepalm' : close ? 'close' : 'toss', variant: misses, sound: facepalm ? 'sad' : close ? 'pop' : 'whoosh', duration: 1900 });
-    if (!close && !facepalm) {
-      const keep = letterHintLevel(index) >= 1 ? ([...normalize(step.answer)][0]?.toUpperCase() ?? '') : '';
-      window.setTimeout(() => setGuess(keep), 700);
-    }
     setShake((n) => n + 1);
   }
 
@@ -243,18 +216,12 @@ function useBendword(puzzle, active) {
     if (!canUseHint) return;
     const index = selected;
     markStarted();
-    const nextLevel = hintLevel(index) + 1;
-    const nextLetterLevel = Math.max(0, nextLevel - concealHints(index));
     setAttempt((a) => ({
       ...a,
       hintLevels: { ...a.hintLevels, [index]: (a.hintLevels[index] ?? 0) + 1 },
       hintsUsed: a.hintsUsed + 1,
       slotStatuses: { ...a.slotStatuses, [index]: 'hinted' },
     }));
-    if (nextLetterLevel === 1 && !guess) setGuess([...normalize(puzzle.steps[index].answer)][0]?.toUpperCase() ?? '');
-    const kind = nextLetterLevel === 1 ? 'stomp' : nextLetterLevel === 2 ? 'count' : nextLetterLevel >= 3 ? 'clue' : 'tada';
-    const message = kind === 'count' ? `${[...normalize(puzzle.steps[index].answer)].length} letters` : kind === 'clue' ? extraClue(puzzle.steps[index]) : kind === 'tada' ? 'Ta-da!' : null;
-    setMascotEvent({ id: Date.now(), kind, message, sound: kind === 'clue' || kind === 'tada' ? 'chime' : kind === 'stomp' ? 'land' : 'step', duration: kind === 'clue' ? 3200 : 2100 });
     setFeedback(null);
   }
 
@@ -280,10 +247,9 @@ function useBendword(puzzle, active) {
   }
 
   return {
-    puzzle, attempt, stats, indices, finalIndex, completed, elapsed, selected, guess, feedback, shake, justSolved, lastMiss, mascotEvent,
+    puzzle, attempt, stats, indices, finalIndex, completed, elapsed, selected, guess, feedback, shake, justSolved,
     hasOpenSelection, canUseHint, isSolved, hintLevel, maxHintLevel, letterHintLevel, isRuleHidden, isClueHidden,
     visibleBefore, nextHintLabel, hintChips, submit, takeHint, reveal, select, changeGuess,
-    clearMascot: (id) => setMascotEvent((event) => event?.id === id ? null : event),
   };
 }
 
@@ -313,57 +279,6 @@ function BendCard({ game, inputRef }) {
   const extra = game.letterHintLevel(selected) >= 3 ? extraClue(step) : null;
   const hintsLeft = game.maxHintLevel(selected) - game.hintLevel(selected);
   const label = game.nextHintLabel();
-  const hintedLetter = game.letterHintLevel(selected) >= 1 && !game.guess
-    ? [...normalize(step.answer)][0]?.toUpperCase() : null;
-  const [pressedKey, setPressedKey] = useState(null);
-  const [mascotEnabled, setMascotEnabled] = useState(() => localStorage.getItem('bendword.mascot') !== 'off');
-  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('bendword.sound') !== 'off');
-  const releaseTimer = useRef(null);
-  // On touch screens the on-screen keys replace the phone's keyboard.
-  const [touchFirst] = useState(() => window.matchMedia('(pointer: coarse)').matches);
-
-  const typeLetter = (letter) => {
-    if (game.guess.length < MAX_GUESS_LENGTH) game.changeGuess(game.guess + letter);
-  };
-  const deleteLetter = () => game.changeGuess(game.guess.slice(0, -1));
-
-  // Physical keyboards: show each press on the matching on-screen key, and type even when
-  // the guess box isn't focused (tablets with keyboards, or after clicking elsewhere).
-  useEffect(() => {
-    const onKeyDown = (event) => {
-      const key = keyForEvent(event);
-      if (!key) return;
-      const target = event.target;
-      const inGuess = target === inputRef.current;
-      const inOtherField = !inGuess && target instanceof HTMLElement
-        && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
-      if (inOtherField) return;
-      if (key === ENTER && !inGuess && target instanceof HTMLButtonElement) return; // let focused buttons activate
-
-      setPressedKey(key);
-      clearTimeout(releaseTimer.current);
-      // Key-up normally releases the key; this is a fallback if one never arrives.
-      releaseTimer.current = setTimeout(() => setPressedKey(null), 600);
-
-      if (inGuess) return; // the guess box handles its own typing
-      event.preventDefault();
-      if (key === DELETE) deleteLetter();
-      else if (event.repeat) return; // only delete repeats when held
-      else if (key === ENTER) game.submit();
-      else typeLetter(key);
-    };
-    const onKeyUp = (event) => {
-      const key = keyForEvent(event) ?? (event.key.length === 1 ? event.key.toUpperCase() : null);
-      setPressedKey((current) => (current === key ? null : current));
-    };
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
-    return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
-    };
-  });
-  useEffect(() => () => clearTimeout(releaseTimer.current), []);
 
   return (
     <section className="bwg-card" aria-labelledby="bwg-card-title">
@@ -417,23 +332,13 @@ function BendCard({ game, inputRef }) {
           id="bwg-guess" ref={inputRef} className={shake ? `is-shaking-${shake % 2}` : ''}
           value={game.guess} onChange={(e) => game.changeGuess(e.target.value)}
           placeholder="Type the next word" autoComplete="off" autoCorrect="off" autoCapitalize="characters"
-          spellCheck={false} maxLength={MAX_GUESS_LENGTH} enterKeyHint="go" aria-describedby="bwg-feedback"
-          inputMode={touchFirst ? 'none' : 'text'}
+          spellCheck={false} maxLength={24} enterKeyHint="go" aria-describedby="bwg-feedback"
         />
+        <button type="submit" className="bwg-btn">Submit</button>
       </form>
       <p id="bwg-feedback" className={`bwg-feedback is-${feedback?.tone ?? 'none'}`} role="status" aria-live="polite">
         {feedback?.text ?? ' '}
       </p>
-      <Keyboard
-        pressedKey={pressedKey} hintedLetter={hintedLetter} canSubmit={normalize(game.guess).length > 0}
-        onLetter={typeLetter} onDelete={deleteLetter} onSubmit={() => game.submit()}
-      />
-      <Mascot event={game.mascotEvent} enabled={mascotEnabled} sound={soundEnabled} onDone={game.clearMascot} />
-      <details className="bwg-bendit-settings">
-        <summary>Bendit settings</summary>
-        <label><input type="checkbox" checked={mascotEnabled} onChange={(e) => { setMascotEnabled(e.target.checked); localStorage.setItem('bendword.mascot', e.target.checked ? 'on' : 'off'); }} /> Show Bendit</label>
-        <label><input type="checkbox" checked={soundEnabled} disabled={!mascotEnabled} onChange={(e) => { setSoundEnabled(e.target.checked); localStorage.setItem('bendword.sound', e.target.checked ? 'on' : 'off'); }} /> Sound effects</label>
-      </details>
     </section>
   );
 }
@@ -456,8 +361,8 @@ function Chain({ game, inputRef, onPick }) {
               {isFinal && <em> · {step.clue}</em>}
             </p>
             {isFinal ? (
-              <div className={`bwg-word is-fixed is-target ${completed ? 'is-reached' : ''}`}>
-                <span className="bwg-tag">{completed ? '✓ Reached' : 'Target'}</span><strong>{display(puzzle.targetWord)}</strong>
+              <div className="bwg-word is-fixed is-target">
+                <span className="bwg-tag">Target</span><strong>{display(puzzle.targetWord)}</strong>
                 {showDetail && <p className="bwg-why">{step.explanation}</p>}
               </div>
             ) : word ? (
@@ -533,24 +438,6 @@ function Result({ game }) {
   );
 }
 
-function Finale({ game, onFinished }) {
-  const word = useMemo(() => [...normalize(game.puzzle.targetWord)].map((c) => c.toUpperCase()), [game.puzzle.targetWord]);
-  const [lit, setLit] = useState([]);
-  const perfect = isPerfect(game.attempt);
-  useEffect(() => {
-    const timers = word.map((letter, i) => window.setTimeout(() => setLit((keys) => [...keys, letter]), 420 + i * 300));
-    timers.push(window.setTimeout(onFinished, 2500 + word.length * 300));
-    return () => timers.forEach(window.clearTimeout);
-  }, [onFinished, word]);
-  const headline = isFlawless(game.attempt) ? 'Flawless!' : perfect ? 'Perfect Bend!' : 'Solved!';
-  return (
-    <section className="bwg-finale" aria-label={`${headline} Bendit spells ${display(game.puzzle.targetWord)}`}>
-      <Mascot event={{ id: 'finale', kind: perfect ? 'flip' : 'cheer', message: headline, sound: 'chime', duration: 9999 }} />
-      <Keyboard litKeys={lit} canSubmit={false} onLetter={() => {}} onDelete={() => {}} onSubmit={() => {}} />
-    </section>
-  );
-}
-
 function Intro({ onClose }) {
   return (
     <section className="bwg-intro" aria-labelledby="bwg-intro-title">
@@ -583,8 +470,6 @@ function Board({ puzzle }) {
   const openStreak = currentStreak(game.stats);
   useEffect(() => { trackOpen(openStreak); }, [openStreak]);
   const today = dayKey();
-  // A previously completed puzzle opens directly to its result; only a fresh solve gets the show.
-  const [finaleFinished, setFinaleFinished] = useState(() => game.completed);
 
   useEffect(() => {
     if (!showIntro && game.hasOpenSelection && window.matchMedia('(pointer: fine)').matches) inputRef.current?.focus();
@@ -612,7 +497,7 @@ function Board({ puzzle }) {
       </header>
 
       {showIntro && !game.completed && <Intro onClose={closeIntro} />}
-      {game.completed ? (finaleFinished ? <Result game={game} /> : <Finale game={game} onFinished={() => setFinaleFinished(true)} />) : !showIntro && game.hasOpenSelection && <BendCard key={game.selected} game={game} inputRef={inputRef} />}
+      {game.completed ? <Result game={game} /> : !showIntro && game.hasOpenSelection && <BendCard key={game.selected} game={game} inputRef={inputRef} />}
       <Chain game={game} inputRef={inputRef} onPick={closeIntro} />
       <AppNudge />
       {!showIntro && !game.completed && (

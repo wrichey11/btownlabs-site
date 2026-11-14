@@ -114,9 +114,6 @@
 .bwg-word.is-pop { animation: bwg-pop .4s ease-out; }
 .bwg-why { grid-column: 2; margin-top: .15rem; font-size: .8rem; line-height: 1.4; color: var(--bw-muted); }
 .bwg-word.is-target .bwg-why { color: #c9ded0; }
-.bwg-word.is-target.is-reached { background: var(--bwg-card); color: var(--bw-ink); border: 2px solid var(--bw-green); }
-.bwg-word.is-target.is-reached .bwg-tag { color: var(--bw-green); }
-.bwg-word.is-target.is-reached .bwg-why { color: var(--bw-muted); }
 
 /* Result */
 .bwg-result { display: grid; gap: .75rem; text-align: center; border-color: var(--bw-green); }
@@ -154,57 +151,4 @@
 @media (max-width: 30rem) {
   .bwg-app { flex-wrap: wrap; }
   .bwg-facts dd { font-size: 1.05rem; }
-}
-
-/* On-screen keyboard (mirrors the iOS app's) */
-.bwg-keys { display: grid; gap: .5rem; padding: .6rem .35rem .45rem; border-radius: .65rem; background: #e6e0d6; user-select: none; -webkit-user-select: none; }
-.bwg-keyrow { display: flex; gap: .3rem; justify-content: center; }
-.bwg-keyrow:nth-child(2) { padding: 0 5%; }
-.bwg-key {
-  flex: 1 1 0; min-width: 0; height: 3.1rem; padding: 0; border: 0; border-radius: .45rem; background: #fffdf9; color: var(--bw-ink);
-  font: 700 1.15rem ui-rounded, system-ui, sans-serif; box-shadow: 0 1.5px 0 rgba(0, 0, 0, .18); cursor: pointer;
-  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-  transition: transform .08s ease-out, background-color .08s ease-out, box-shadow .08s ease-out;
-}
-.bwg-key.is-wide { flex-grow: 1.5; font-size: .7rem; font-weight: 800; letter-spacing: 0; text-transform: uppercase; }
-.bwg-key.is-action { background: #c7c2b8; font-size: 1.15rem; }
-.bwg-key.is-enter { background: var(--bw-green); color: white; }
-.bwg-key.is-hinted { background: #fbe9d2; box-shadow: inset 0 0 0 2px var(--bwg-hint); }
-.bwg-key.is-pressed { transform: scale(.94); box-shadow: none; background: #cfe3d6; color: var(--bw-green); }
-.bwg-key.is-enter.is-pressed { background: #003f31; color: white; }
-.bwg-key.is-hinted.is-pressed { background: #f5d5ac; color: var(--bw-ink); }
-.bwg-key.is-lit { background: #9ae5c0; color: #063b2d; box-shadow: inset 0 0 0 2px var(--bw-green); transform: scale(.94); }
-.bwg-key.is-open { transform: perspective(8rem) rotateX(-64deg); transform-origin: bottom; background: #24211e; color: transparent; }
-.bwg-key:disabled { opacity: .45; cursor: default; }
-@media (prefers-reduced-motion: reduce) { .bwg-key { transition: none; } .bwg-key.is-pressed { transform: none; } }
-
-/* Bendit lives above the keyboard, like the iPhone version, without blocking its keys. */
-.bwg-card, .bwg-finale { position: relative; }
-.bwg-bendit { position: absolute; z-index: 4; right: 14%; bottom: 10.2rem; width: 4rem; height: 6rem; color: #172019; pointer-events: none; transform-origin: bottom center; animation: bwg-bendit-pop 2.1s both; }
-.bwg-bendit-figure { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 3px 2px #0002); }
-.bwg-bendit-hat { color: #171918; }
-.bwg-bendit-bubble { position: absolute; right: 3.5rem; bottom: 5.2rem; width: max-content; max-width: min(15rem, 60vw); padding: .5rem .7rem; border: 1px solid var(--bw-line); border-radius: .7rem .7rem .15rem .7rem; background: white; color: var(--bw-ink); font-size: .82rem; font-weight: 750; box-shadow: 0 .35rem 1rem #0002; animation: bwg-bubble .25s .25s both; }
-.bwg-bendit.is-facepalm .bwg-bendit-figure { animation: bwg-facepalm 1.2s .2s both; }
-.bwg-bendit.is-close .bwg-bendit-figure, .bwg-bendit.is-cheer .bwg-bendit-figure { animation: bwg-cheer .7s .2s ease-out both; }
-.bwg-bendit.is-toss .bwg-bendit-figure { animation: bwg-toss 1.2s .2s ease-in-out both; }
-.bwg-bendit.is-stomp .bwg-bendit-figure { animation: bwg-stomp 1.25s .2s ease-in-out both; }
-.bwg-bendit.is-count .bwg-bendit-figure { animation: bwg-walk 1.6s .2s ease-in-out both; }
-.bwg-bendit.is-flip .bwg-bendit-figure { animation: bwg-flip 1s 1.6s ease-in-out both; }
-.bwg-bendit-settings { font-size: .75rem; color: var(--bw-muted); text-align: right; }
-.bwg-bendit-settings summary { cursor: pointer; font-weight: 700; }
-.bwg-bendit-settings label { display: inline-flex; align-items: center; gap: .25rem; margin: .4rem 0 0 .75rem; }
-.bwg-finale { min-height: 17rem; padding-top: 6rem; }
-.bwg-finale .bwg-bendit { bottom: 10rem; right: 12%; animation-duration: 9999s; }
-
-@keyframes bwg-bendit-pop { 0% { opacity: 0; transform: translateY(4rem) scale(.7); } 12%, 82% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(4rem) scale(.75); } }
-@keyframes bwg-bubble { from { opacity: 0; transform: scale(.7); transform-origin: bottom right; } to { opacity: 1; transform: none; } }
-@keyframes bwg-cheer { 35% { transform: translateY(-1.25rem) rotate(-7deg); } 65% { transform: translateY(0) rotate(5deg); } }
-@keyframes bwg-facepalm { 45%, 85% { transform: rotate(9deg) translateY(.3rem); opacity: .8; } }
-@keyframes bwg-toss { 35% { transform: translate(-5rem, -2.5rem) rotate(-12deg); } 70% { transform: translate(1rem, -1rem) rotate(16deg); } }
-@keyframes bwg-stomp { 40% { transform: translate(-8rem, -3rem) rotate(-8deg); } 62% { transform: translate(-8rem, .4rem) scaleY(.86); } }
-@keyframes bwg-walk { 20% { transform: translate(-10rem, -5rem) rotate(-5deg); } 70% { transform: translate(1rem, -5rem) rotate(5deg); } }
-@keyframes bwg-flip { 50% { transform: translateY(-3.5rem) rotate(-180deg); } 100% { transform: rotate(-360deg); } }
-@media (prefers-reduced-motion: reduce) {
-  .bwg-bendit { display: none; }
-  .bwg-finale { min-height: 0; padding-top: 0; }
 }
