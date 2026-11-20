@@ -62,7 +62,7 @@ const DISPLAY_NAMES = {
   addOneLetterAndRearrange: 'Add + rearrange', removeOneLetterAndRearrange: 'Remove + rearrange',
   prefix: 'Prefix', suffix: 'Suffix', prefixChange: 'Prefix change', suffixChange: 'Suffix change',
   compound: 'Compound', commonPhrase: 'Common phrase', wordContaining: 'Contains word', split: 'Split',
-  splitCompound: 'Split compound', mergeIntoCompound: 'Merge compound', semanticPivot: 'Semantic pivot',
+  splitCompound: 'Split compound', mergeIntoCompound: 'Merge compound', meaningTwist: 'Meaning twist',
   compoundBridge: 'Compound bridge', phraseBridge: 'Phrase bridge', doubleMeaning: 'Double meaning',
   soundChange: 'Sound change', twoCondition: 'Two-condition', rootRelated: 'Root / related',
   rootFamily: 'Root family', beforeAfterPhrase: 'Before / after',
@@ -90,7 +90,7 @@ function defaultInstruction(type) {
       return 'A word that joins the previous word to make a compound.';
     case 'commonPhrase': case 'phraseBridge': case 'beforeAfterPhrase':
       return 'A word that pairs with the previous word in a familiar phrase.';
-    case 'semanticPivot': case 'doubleMeaning': return 'Pivot to another meaning of the previous word.';
+    case 'meaningTwist': case 'doubleMeaning': return 'Pivot to another meaning of the previous word.';
     default: return 'Follow the clue from the previous word.';
   }
 }
