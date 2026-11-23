@@ -59,7 +59,11 @@ export default function PrivacyIndex() {
           description="Classic Card Game Fun"
           link="/privacy/btownsolitaire"
         />
-
+<AppLink
+          name="TwelveSeams"
+          description="Tile match Puzzle Game"
+          link="/privacy/twelveseams"
+        />
         
       </div>
 
