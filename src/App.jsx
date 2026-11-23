@@ -10,6 +10,7 @@ import PrivacyKidneyOS from "./pages/PrivacyKidneyOS";
 import PrivacyBendword from "./pages/PrivacyBendword";
 import PrivacyTidebreaker from "./pages/PrivacyTidebreaker";
 import PrivacyBtownSolitaire from "./pages/PrivacyBtownSolitaire";
+import PrivacyTwelveSeams from "./pages/PrivacyTwelveSeams";
 
 function BtownLabsLandingPage() {
   const services = [
@@ -318,6 +319,8 @@ export default function App() {
       <Route path="/privacy/bendword" element={<PrivacyBendword />} />
       <Route path="/privacy/tidebreaker" element={<PrivacyTidebreaker />} />
         <Route path="/privacy/btownsolitaire" element={<PrivacyBtownSolitaire />} />
+        <Route path="/privacy/twelveseams" element={<PrivacyTwelveSeams />} />
+
     </Routes>
   );
 }
