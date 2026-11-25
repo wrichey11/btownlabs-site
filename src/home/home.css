@@ -1,0 +1,154 @@
+/* Btown Labs home — Flatirons night intro */
+
+.bt-home {
+  --bt-accent: #05d4bb;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #03060b;
+  color: #fff;
+}
+
+/* ---------- Hero ---------- */
+
+.bt-hero {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  min-height: 640px;
+  max-height: 1100px;
+  overflow: hidden;
+  background: #03060b;
+}
+
+.bt-hero__zoom {
+  position: absolute;
+  inset: 0;
+  animation: bt-zoom 9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.4s both;
+}
+
+.bt-hero__photo {
+  position: absolute;
+  inset: 0;
+  background-image: url("/images/home/flatirons-night.jpg");
+  background-image: image-set(
+    url("/images/home/flatirons-night.webp") type("image/webp"),
+    url("/images/home/flatirons-night.jpg") type("image/jpeg")
+  );
+  background-position: 64% 100%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: brightness(0.5) saturate(0.8) contrast(1.08);
+  animation: bt-fade 3s ease-out 0.6s both;
+}
+
+@media (max-width: 800px) {
+  .bt-hero__photo {
+    background-image: url("/images/home/flatirons-night-1280.webp");
+    background-position: 72% 100%;
+  }
+}
+
+.bt-hero__tint {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 14, 40, 0.38);
+  mix-blend-mode: multiply;
+}
+
+.bt-hero__shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(3, 6, 11, 0.55) 0%, rgba(3, 6, 11, 0) 18%, rgba(3, 6, 11, 0) 80%, rgba(3, 6, 11, 0.85) 100%),
+    linear-gradient(90deg, rgba(3, 6, 11, 0.78) 0%, rgba(3, 6, 11, 0.5) 36%, rgba(3, 6, 11, 0) 64%);
+}
+
+.bt-hero__shooting {
+  position: absolute;
+  top: 10%;
+  left: 82%;
+  width: 120px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
+  opacity: 0;
+  animation: bt-shoot 12s ease-in 2s infinite;
+}
+
+.bt-hero__header { animation: bt-fade 1.4s ease-out 5s both; }
+
+.bt-hero__copy { animation: none; }
+
+.bt-eyebrow { animation: bt-fade 1.6s ease-out 2.4s both; }
+
+.bt-word {
+  display: inline-block;
+  animation: bt-word 1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(3s + var(--i) * 0.15s);
+}
+
+.bt-hero__sub { animation: bt-fade 1.4s ease-out 4.4s both; }
+.bt-hero__ctas { animation: bt-fade 1.4s ease-out 4.8s both; }
+.bt-hero__scroll { animation: bt-fade 1.4s ease-out 5.6s both; }
+
+.bt-hero__dot { animation: bt-dot 2s ease-in-out infinite; }
+
+/* Scroll-linked exit for the hero (progressive: only where supported) */
+@supports (animation-timeline: scroll()) {
+  .bt-hero__copy {
+    animation: bt-away linear both;
+    animation-timeline: scroll();
+    animation-range: 0 80vh;
+  }
+  .bt-hero__sink {
+    animation: bt-sink linear both;
+    animation-timeline: scroll();
+    animation-range: 0 100vh;
+  }
+}
+
+/* ---------- Scroll reveal (IntersectionObserver adds .is-in) ---------- */
+
+.bt-reveal {
+  opacity: 0;
+  transform: translateY(48px);
+  transition: opacity 0.9s ease-out, transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: calc(var(--d, 0) * 90ms);
+}
+
+.bt-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes bt-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bt-zoom { from { transform: scale(1.06); } to { transform: scale(1); } }
+@keyframes bt-word {
+  from { opacity: 0; transform: translateY(16px); filter: blur(8px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes bt-shoot {
+  0%, 88% { opacity: 0; transform: translate(0, 0) rotate(-24deg); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-420px, 190px) rotate(-24deg); }
+}
+@keyframes bt-dot {
+  0% { transform: translateY(0); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(34px); opacity: 0; }
+}
+@keyframes bt-away { to { opacity: 0; transform: translateY(-80px); } }
+@keyframes bt-sink { to { transform: translateY(120px); } }
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .bt-home *,
+  .bt-home *::before,
+  .bt-home *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .bt-reveal { opacity: 1; transform: none; }
+}
