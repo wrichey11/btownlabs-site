@@ -71,7 +71,7 @@
   border-radius: 2px;
   background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
   opacity: 0;
-  animation: bt-shoot 12s ease-in 2s infinite;
+  animation: bt-shoot 12s ease-in -9.8s infinite;
 }
 
 .bt-hero__header { animation: bt-fade 1.4s ease-out 5s both; }
