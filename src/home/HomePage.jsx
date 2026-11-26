@@ -133,7 +133,7 @@ export default function HomePage() {
           </h1>
           <p className="bt-hero__sub mt-6 max-w-xl text-lg leading-relaxed text-slate-300">
             Custom software, product experiences, and intelligent workflows, built for businesses that
-            want technology to create leverage.
+            want technology to improve operations.
           </p>
           <div className="bt-hero__ctas mt-8 flex flex-wrap gap-3.5">
             <a
