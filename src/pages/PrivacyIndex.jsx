@@ -64,6 +64,11 @@ export default function PrivacyIndex() {
           description="Tile match Puzzle Game"
           link="/privacy/twelveseams"
         />
+        <AppLink
+          name="Stitch & Square: Quilt Puzzle"
+          description="Cozy quilting puzzle game"
+          link="/privacy/stitchsquare"
+        />
         
       </div>
 
